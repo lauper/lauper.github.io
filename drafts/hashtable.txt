@@ -1,0 +1,5 @@
+
+Rehash only top bits
+
+4KB pages = 12 bits
+

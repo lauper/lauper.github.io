@@ -1,0 +1,168 @@
+
+Definitions
+Limit, order ?
+
+3 modes a) feed handler b) strat c) histo
+Input
+
+
+ask questions like "what are the best bid and offer?", "how much volume is there between prices A and B?" or "what is order X's current position in the book?"
+
+
+Stats about book sparsity, constant in return space, so dependent on price in tick space?
+comment about indexing an array with variable tick sizes
+stats about max number of limits => pre-allocate hashtables
+
+Activity characteristics:
+
+
+- The vast majority of the activity is made up of add and cancel messages [add figures]
+- The majority of the activity is on the inside of the book, with some on the extremes [add figures]
+- Orders are removed from the top of the book and added deeper
+
+Goal
+
+If you are writing a feed handler, you want to process the feed as fast as possible and forward it in a standardized format. You have to decode the messages, process them to update your state, and forward state changes down the pipe, eventually aggregating by price.
+If you are writing a strategy, you want to read the prepared feed that should be in a format ready for fast consumption and compute statistics and signals. That means you will have to be a lot more focused on presenting the feed for fast access to all the book.
+[ todo add history ]
+
+Feed handler implementations
+
+
+Limit snapshots protocol
+
+Example TSE (Tokyo) / NYSE
+https://www.google.com/search?q=open+book+ultra+specifications
+
+This is the simplest protocol out there, so it's easy to process. As it repeats all the information for a limit in every message it's also self-healing. The downside is that it's quite inefficient and does not include individual order details.
+Depending on the feed, there are a few variations around the number of limit provided (NYSE's open book ultra and TSE's full flex gives everything, TSE's flex gives 8 limits), or the number of price levels (meaning if there's no order at a price level, it still counts).
+Implementation
+
+If we forward the messages in an equivalent snapshot protocol, we don't actually need to store any state, however we probably want a more efficient protocol, and have a way to provide a clean state at any time. We can use a simple hashtable to store our limits by price which will give us O(1) on all the operations we need: lookup by price, insertion and unordered traversal. We can optimise on that by providing a non sparse circular buffer acting as a cache on the inside of the book, that would improve memory locality and could bypass altogether the hashtable on feeds with a low number of limits. It can get a bit tricky when the market has tick sizes depending on the price.
+
+
+struct Limit {
+    decimal price;
+    int orderNumber;
+    int totalQty;
+}
+
+template <int cacheSize>
+struct Book {
+    std::unordered_map<decimal,Limit> bidLimits;
+    std::unordered_map<decimal,Limit> askLimits;
+    std::array<Limit, cacheSize> bidCache;
+    std::array<Limit, cacheSize> askCache;
+}
+
+Limit updates protocol
+
+Example ARCA ???? seems not! (ah bon)
+http://www.google.co.uk/search?q=nyse+arca+specifications
+
+This time instead of repeating all the information, they send us an update of changes at that price.
+
+Implementation
+
+
+Order protocol
+
+
+Example NASDAQ
+
+
+Message / Key / Data
+Add / Price&Side / OrderId&Qty
+Cancel / OrderId / Qty
+Execute / OrderId / Qty
+
+
+
+We can choose a data structure keeping in mind that:
+- There are three main categories of messages: add, cancel, and execute
+- Add messages should go at the back of the queue at that price
+- Cancel and execution messages do not contain price information, so we should locate the order by its id
+
+
+
+
+Implementations:
+
+a)
+Hashtable orderId -> order
+Tree price -> limit
+Hashtable price -> limit (??)
+Queue limit -> order
+[option array cache around mid price on top of the tree]
+
+
+
+Add - O(log M) for the first order at a limit, O(1) for all others [why? it's a tree!!]
+Cancel - O(1)
+Execute - O(1)
+GetQuantityAtLimit - O(1)
+GetBestBid/Offer - O(1)
+
+
+
+
+
+b)
+Replace the tree by a hashtable (don't we already have it?) and a linked list to get order
+
+
+[todo: use structs or classes?]
+[todo: how many bits in the orderId?]
+
+class Order {
+public:
+    int idNumber;
+    bool buyOrSell;
+    int qty;
+    int limit;
+    int entryTime;
+    int eventTime;
+}
+
+
+class Limit {
+public:
+    decimal price;
+    int orderNumber;
+    int totalQty;
+    std::list<Order> orders;
+}
+
+
+class Book {
+public:
+    std::map<Limit> bidLimits;
+    std::map<Limit> askLimits;
+    Limit *highestBid;
+    Limit *lowestAsk;
+}
+
+
+Memory
+
+a) GC environment => recycle
+b) c++ => pool /batch allocator
+
+Data checks
+
+Monotonic increasing timestamps
+Monotonic increasing order ids
+No reference to an order id before its add message
+
+fpga
+
+Details
+flags, timestamps, seq numbers, arbitrage, retransmissions / refresh
+abominable protocols = OMX
+
+Sources
+
+
+http://www.quantcup.org/home/howtohft_howtobuildafastlimitorderbook
+http://howtohft.blogspot.co.uk/2012/07/tradingphysics-historical-totalview.html
+https://www.tradingphysics.com

@@ -1,0 +1,11 @@
+Namespace
+- book
+- instruments
+- risk model
+- trader
+- strategy
+- signals
+
+Model
+Inputs: market data / static data / params / trades & positions
+Ouputs: logs / ui / orders (or interests)

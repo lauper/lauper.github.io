@@ -1,0 +1,14 @@
+main indexes
+- feed
+- symbol
+- date
+
+compress data
+- delta / LZW / RLE
+
+aggregate data by time range
+
+1) lookup ranges in meta data (or have them in a common table)
+2) compute the key with range + main indexes
+3) eventually add a col id for user data
+
