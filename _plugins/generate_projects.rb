@@ -80,6 +80,7 @@ module Jekyll
       @dir  = project_dir
 
       self.data['repository'] = "git://github.com/lauper/#{project_name}.git"
+      self..data['layout'] = "default"
 
       # Ignore the project unless it has been marked as published.
       #unless self.data['published']
