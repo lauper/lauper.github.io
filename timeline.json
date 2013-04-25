@@ -1,7 +1,6 @@
 ---
 layout: nil
 ---
-
 {
   "timeline":
   {
@@ -27,7 +26,7 @@ layout: nil
 					"credit":"Credit Name Goes Here",
 					"caption":"Caption text goes here"
 				}
-			}
+			},
       			{% endfor %}
 		]
 	}
