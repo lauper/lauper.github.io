@@ -18,8 +18,8 @@ title: Laurent's blog
 		},
 		"date": [
 			{% for post in site.posts %}
-      {
-    		"startDate":"{{ post.date | date: '%Y,%m,%d' }}",
+      			{
+    				"startDate":"{{ post.date | date: '%Y,%m,%d' }}",
 				"endDate":"{{ post.date | date: '%Y,%m,%d' }}",
 				"headline":"{{ post.title }}",
 				"text":"<a href="{{ post.url }}">{{ post.title }}</a>",
@@ -29,8 +29,8 @@ title: Laurent's blog
 					"credit":"Credit Name Goes Here",
 					"caption":"Caption text goes here"
 				}
-			},
-      {% endfor %}
+			}
+      			{% endfor %}
 		]
 	}
 }
