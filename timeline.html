@@ -1,0 +1,37 @@
+---
+layout: none
+title: Laurent's blog
+---
+
+{
+  "timeline":
+	{
+		"headline":"Blog Posts",
+		"type":"default",
+		"startDate":"2000",
+		"text":"<p>Blog Posts</p>",
+		"asset":
+		{
+			"media":"http://yourdomain_or_socialmedialink_goes_here.jpg",
+			"credit":"Credit Name Goes Here",
+			"caption":"Caption text goes here"
+		},
+		"date": [
+			{% for post in site.posts %}
+      {
+    		"startDate":"{{ post.date }}",
+				"endDate":"{{ post.date }}",
+				"headline":"{{ post.title }}",
+				"text":"<a href="{{ post.url }}">{{ post.title }}</a>",
+				"asset":
+				{
+					"media":"http://twitter.com/ArjunaSoriano/status/164181156147900416",
+					"credit":"Credit Name Goes Here",
+					"caption":"Caption text goes here"
+				}
+			},
+      {% endfor %}
+		]
+	}
+}
+
