@@ -20,7 +20,7 @@ title: Laurent's blog
 			{% for post in site.posts %}
       {
     		"startDate":"{{ post.date }}",
-				"endDate":"{{ post.date }}",
+				"endDate":"{{ post.date | date %Y,%m,%d }}",
 				"headline":"{{ post.title }}",
 				"text":"<a href="{{ post.url }}">{{ post.title }}</a>",
 				"asset":
