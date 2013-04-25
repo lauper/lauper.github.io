@@ -16,13 +16,12 @@ title: Laurent's blog
 			"credit":"Credit Name Goes Here",
 			"caption":"Caption text goes here"
 		},
-		"date": [
-			{% for post in site.posts %}
+		"date": [	{% for post in site.posts %}
       			{
     				"startDate":"{{ post.date | date: '%Y,%m,%d' }}",
 				"endDate":"{{ post.date | date: '%Y,%m,%d' }}",
 				"headline":"{{ post.title }}",
-				"text":"<a href='{{ post.url }}'>{{ post.title }}</a>",
+				"text":"<p>{{ post.url }}'</p>",
 				"asset":
 				{
 					"media":"http://twitter.com/ArjunaSoriano/status/164181156147900416",
